@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # Serviço da sua aplicação Flask
+  webapp:
+    build:
+      context: .
+      target: prod
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    # A variável MONGO_URI ainda pode existir, mas o host 'mongo' não será encontrado
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/
+    # depends_on:
+    #   - mongo # Comente esta linha para o teste
+
+  # Serviço do banco de dados MongoDB (Comentado para o teste)
+  # mongo:
+  #   image: mongo:latest
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongo-data:/data/db
+
+# volumes:
+#   mongo-data:
