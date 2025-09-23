@@ -1,40 +1,75 @@
-from typing import Optional, List
-from ..repositories.base import UserRepository
+from typing import Dict, Optional
+from bson import ObjectId
+from domain.User import Usuario
+from .user_repository import UserRepository  # Sua implementação concreta do repositório
+from .utils import hash_password, verify_password, create_token_pair # Utilitários de segurança
 
 class UserService:
-    def __init__(self, user_repo: UserRepository):
-        self.user_repo = user_repo
+    """
+    Serviço focado em casos de uso de autenticação e gerenciamento de perfil de usuário.
+    """
+    def __init__(self, user_repository: UserRepository):
+        self.user_repository = user_repository
 
-    def get_user_by_id(self, user_id: str) -> Optional[dict]:
-        """Busca um usuário. A metadata já vem populada pelo repositório."""
-        # Se for necessário um tratamento de erro ou lógica de permissão, ela entraria aqui.
-        return self.user_repo.find_by_id(user_id)
+    def register(self, dto: Dict) -> Usuario:
+        """
+        Registra um novo usuário no sistema.
+        :param dto: Dicionário com dados como 'username', 'email', 'password', 'name'.
+        """
+        if not all(k in dto for k in ['username', 'email', 'password']):
+            raise ValueError("Campos 'username', 'email' e 'password' são obrigatórios.")
 
-    def get_all_users(self) -> List[dict]:
-        """Busca todos os usuários."""
-        return self.user_repo.find_all()
-    
-    def create_user(self, name: str, email: str, creator_id: str) -> dict:
-        """
-        Cria um novo usuário, passando o ID do criador para a auditoria.
-        
-        :param name: Nome do novo usuário.
-        :param email: Email do novo usuário.
-        :param creator_id: ID do usuário autenticado que está realizando a ação.
-        """
-        
-        user_data = {"name": name, "email": email}
-        
-        return self.user_repo.save(user_data, current_user_id=creator_id)
+        if self.user_repository.find_by_email(dto['email']):
+            raise ValueError(f"O email '{dto['email']}' já está em uso.")
 
-    def update_user(self, user_id_to_update: str, update_data: dict, updater_id: str) -> Optional[dict]:
-        """
-        Atualiza um usuário existente, passando o ID do atualizador para a auditoria.
+        hashed_pwd = hash_password(dto['password'])
+
+        new_user = Usuario(
+            username=dto['username'],
+            email=dto['email'],
+            password_hash=hashed_pwd,
+            name=dto.get('name', ''), 
+            terms_accepted=dto.get('terms_accepted', False)
+        )
         
-        :param user_id_to_update: ID do usuário a ser atualizado.
-        :param update_data: Dicionário com os campos a serem atualizados.
-        :param updater_id: ID do usuário autenticado que está realizando a ação.
+        # 5. Persistir no banco através do repositório
+        return self.user_repository.save(new_user)
+
+    def login(self, creds: Dict) -> Dict:
         """
-        update_data['id'] = user_id_to_update
+        Autentica um usuário e retorna um par de tokens.
+        :param creds: Dicionário com 'email' e 'password'.
+        """
+        if not all(k in creds for k in ['email', 'password']):
+            raise ValueError("Campos 'email' e 'password' são obrigatórios.")
+
+        user = self.user_repository.find_by_email(creds['email'])
+        if not user:
+            raise ValueError("Credenciais inválidas.") 
+
+        if not verify_password(creds['password'], user.password):
+            raise ValueError("Credenciais inválidas.")
+
+        token_pair = create_token_pair(user_id=str(user._id), username=user.username)
+
+        return token_pair
+
+    def update_profile(self, user_id: ObjectId, dto: Dict) -> Usuario:
+        """
+        Atualiza dados do perfil de um usuário.
+        :param user_id: ID do usuário a ser atualizado.
+        :param dto: Dicionário com os campos a serem alterados (ex: 'name', 'avatar_url').
+        """
+        # 1. Buscar o usuário que será atualizado
+        user_to_update = self.user_repository.find_by_id(user_id)
+        if not user_to_update:
+            raise ValueError(f"Usuário com ID '{user_id}' não encontrado.")
+
+        # 2. Atualizar os atributos do objeto com os dados do DTO
+        # REGRA DE NEGÓCIO: Impedir a alteração de campos sensíveis por este método
+        for key, value in dto.items():
+            if hasattr(user_to_update, key) and key not in ['_id', 'email', 'username', 'password']:
+                setattr(user_to_update, key, value)
         
-        return self.user_repo.save(update_data, current_user_id=updater_id)
+        # 3. Salvar as alterações
+        return self.user_repository.save(user_to_update)
