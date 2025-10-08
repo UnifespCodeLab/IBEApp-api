@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>8506ff3e-9565-4710-b922-b29e148154be.DATABASE:d9oga7lftk34ur</OriginalElement>
+  <nodes>
+    <node x="0.0" y="364.0">8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.categorias</node>
+    <node x="607.0" y="0.0">8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.form_socioeconomico</node>
+    <node x="400.0" y="156.0">8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.usuarios</node>
+    <node x="610.0" y="449.0">8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.privilegios</node>
+    <node x="227.0" y="80.0">8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.comentarios</node>
+    <node x="168.0" y="283.0">8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.postagens</node>
+    <node x="368.0" y="557.0">8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.bairros</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.comentarios" target="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.comentarios">
+      <point x="33.0" y="-81.0" />
+      <point x="326.0" y="65.0" />
+      <point x="332.0" y="59.0" />
+      <point x="374.0" y="59.0" />
+      <point x="380.0" y="65.0" />
+      <point x="380.0" y="114.5" />
+      <point x="374.0" y="120.5" />
+      <point x="66.0" y="-40.5" />
+    </edge>
+    <edge source="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.postagens" target="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.usuarios">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.comentarios" target="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.usuarios">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.postagens" target="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.categorias">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.comentarios" target="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.postagens">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.usuarios" target="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.privilegios">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.usuarios" target="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.bairros">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.form_socioeconomico" target="8506ff3e-9565-4710-b922-b29e148154be.TABLE:d9oga7lftk34ur.public.usuarios">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+  </edges>
+  <settings layout="Orthogonal" zoom="1.0" x="406.5" y="326.5" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Key columns</Category>
+    <Category>Columns</Category>
+    <Category>Virtual foreign keys</Category>
+  </Categories>
+</Diagram>
+

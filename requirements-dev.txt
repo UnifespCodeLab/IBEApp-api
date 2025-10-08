@@ -1,0 +1,3 @@
+# requirements-dev.txt
+-r requirements.txt # Inclui tudo do arquivo principal
+debugpy
