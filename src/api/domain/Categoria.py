@@ -1,12 +1,7 @@
-from bson import ObjectId
+from typing import Optional
+from pydantic import Field
+from .Base import MongoModel
 
-class Categoria:
-    def __init__(self, id: ObjectId, name: str):
-        self._id = id if id else ObjectId()
-        self.name = name
-
-    def to_dict(self):
-        return {
-            "_id": str(self._id),
-            "name": self.name
-        }
+class Categoria(MongoModel):
+    name: str = Field(..., max_length=100)
+    description: Optional[str] = Field(None, max_length=500)
