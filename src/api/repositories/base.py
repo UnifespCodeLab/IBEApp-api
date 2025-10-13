@@ -1,40 +1,46 @@
-from typing import Protocol, Optional, List, Dict
+from typing import List, Optional, Type, TypeVar
+from bson import ObjectId
+from pymongo.database import Database
+from pydantic import BaseModel
 
-class UserRepository(Protocol):
-    """
-    Define o contrato (a interface) para todas as operações de acesso
-    a dados relacionadas à entidade 'Usuário'.
+T = TypeVar("T", bound=BaseModel)
 
-    Qualquer classe de repositório de usuário 
-    DEVE implementar todos estes métodos para ser considerada compatível.
-    """
+class BaseRepository:
+    def __init__(self, db: Database, collection_name: str, model: Type[T]):
+        self.db = db
+        self.collection = self.db[collection_name]
+        self.model = model
 
-    def find_by_id(self, user_id: str) -> Optional[Dict]:
-        """
-        Busca um único usuário pelo seu ID. Retorna o documento ou None se não encontrado.
-        """
-        ...
+    def create(self, data: T) -> T:
+        """Cria um novo documento no banco de dados."""
+        document = data.model_dump(by_alias=True, exclude_none=True)
+        result = self.collection.insert_one(document)
+        document['_id'] = result.inserted_id
+        return self.model(**document)
 
-    def find_all(self,
-                 active_only: bool = True,
-                 email: Optional[List[str]] = None,
-                 username: Optional[List[str]] = None) -> List[Dict]:
-        """
-        Busca uma lista de usuários, com a possibilidade de aplicar filtros.
-        Retorna uma lista de documentos, que pode ser vazia.
-        """
-        ...
+    def find_by_id(self, item_id: str) -> Optional[T]:
+        """Busca um documento pelo seu ID."""
+        document = self.collection.find_one({"_id": ObjectId(item_id)})
+        if document:
+            return self.model(**document)
+        return None
 
-    def save(self, user_data: Dict, current_user_id: str) -> Dict:
-        """
-        Salva (cria ou atualiza) um documento de usuário no banco.
-        Requer o ID do usuário realizando a ação para fins de auditoria (metadata).
-        Retorna o documento salvo, como ele está no banco após a operação.
-        """
-        ...
+    def find_all(self, skip: int = 0, limit: int = 100) -> List[T]:
+        """Busca todos os documentos com paginação."""
+        cursor = self.collection.find().skip(skip).limit(limit)
+        return [self.model(**doc) for doc in cursor]
 
-    def delete(self, user_id: str) -> None:
-        """
-        Deleta um usuário pelo seu ID. Não retorna nada.
-        """
-        ...
+    def update(self, item_id: str, data: dict) -> Optional[T]:
+        """Atualiza um documento existente."""
+        result = self.collection.update_one(
+            {"_id": ObjectId(item_id)},
+            {"$set": data, "$currentDate": {"updateAt": True}}
+        )
+        if result.modified_count:
+            return self.find_by_id(item_id)
+        return None
+
+    def delete(self, item_id: str) -> bool:
+        """Deleta um documento pelo seu ID."""
+        result = self.collection.delete_one({"_id": ObjectId(item_id)})
+        return result.deleted_count > 0
